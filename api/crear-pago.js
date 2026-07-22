@@ -2,9 +2,7 @@
 // Función serverless de Vercel. Recibe el carrito, calcula el 50% (seña)
 // y crea una preferencia de pago en Mercado Pago. Devuelve el link (init_point)
 // al que el frontend redirige al comprador.
-
 const { MercadoPagoConfig, Preference } = require("mercadopago");
-
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
 });
@@ -14,15 +12,12 @@ module.exports = async (req, res) => {
     res.status(405).json({ error: "Método no permitido" });
     return;
   }
-
   try {
     const { items } = req.body;
-
     if (!Array.isArray(items) || items.length === 0) {
       res.status(400).json({ error: "El carrito está vacío" });
       return;
     }
-
     // Validamos y calculamos el total en el SERVIDOR (nunca confiar en precios
     // enviados desde el navegador). Acá lo hacemos con lo que llega del cart,
     // pero lo ideal es cruzar cada item contra tu catálogo real de precios.
@@ -39,11 +34,8 @@ module.exports = async (req, res) => {
       }
       total += it.unit_price * it.quantity;
     }
-
     const sena = Math.round(total * 0.5 * 100) / 100;
-
     const preference = new Preference(client);
-
     const result = await preference.create({
       body: {
         items: [
@@ -67,12 +59,12 @@ module.exports = async (req, res) => {
         },
       },
     });
-
     res.status(200).json({ init_point: result.init_point });
   } catch (err) {
     console.error("Error creando preferencia de Mercado Pago:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "No se pudo generar el pago",
-      detalle: err.message || String(err)
+      detalle: err.message || String(err),
     });
   }
+};
