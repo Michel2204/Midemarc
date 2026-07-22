@@ -1927,7 +1927,16 @@ function updateWhatsappLink(){
     lines.push(`• ${qty}x ${label} — ${fmt(p.price * qty)}`);
   });
 
-  lines.push(``, `Total: ${fmt(cartTotal())}`, ``, `Envío a todo el país. Quedo atento/a a los datos para coordinar.`);
+  const total = cartTotal();
+  const sena = total * 0.5;
+  lines.push(
+    ``,
+    `Total: ${fmt(total)}`,
+    `Seña para iniciar (50%): ${fmt(sena)}`,
+    `Saldo restante (contra entrega/envío): ${fmt(total - sena)}`,
+    ``,
+    `Envío a todo el país. Quedo atento/a a los datos de pago (Mercado Pago) para coordinar el envío.`
+  );
 
   const text = encodeURIComponent(lines.join("\n"));
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
