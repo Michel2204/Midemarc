@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Midemarc | Indumentaria y Accesorios para Moto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+
+/* =========================================================
+   MIDEMARC — hoja de estilos
+   Paleta: negro / rojo / naranja / blanco (pedido del cliente)
+   ========================================================= */
+
+:root{
+  --black:      #0b0b0c;
+  --black-2:    #17171a;
+  --black-3:    #202024;
+  --red:        #e2231a;
+  --ember:      #f4841f;
+  --gray:       #9a9a9d;
+  --gray-dark:  #58585b;
+  --cream:      #f5f2ec;
+  --line:       #2c2c30;
+  --gradient:   linear-gradient(100deg, var(--red) 0%, var(--ember) 100%);
+  --radius:     10px;
+  --mono:       'JetBrains Mono', monospace;
+}
+
+/* textura de grano/asfalto — fija sobre todo el fondo */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:0.5;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/></svg>");
+}
+body > *{ position:relative; z-index:1; }
+
+/* ---------- utilidades scroll-reveal ---------- */
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+}
+.reveal.in-view{ opacity:1; transform:translateY(0); }
+.reveal-stagger > *{
+  opacity:0;
+  transform:translateY(22px);
+  transition:opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+}
+.reveal-stagger.in-view > *{ opacity:1; transform:translateY(0); }
+.reveal-stagger.in-view > *:nth-child(1){ transition-delay:.05s; }
+.reveal-stagger.in-view > *:nth-child(2){ transition-delay:.15s; }
+.reveal-stagger.in-view > *:nth-child(3){ transition-delay:.25s; }
+.reveal-stagger.in-view > *:nth-child(4){ transition-delay:.35s; }
+@media (prefers-reduced-motion: reduce){
+  .reveal, .reveal-stagger > *{ opacity:1; transform:none; transition:none; }
+}
+
+/* ---------- linea de ruta (elemento de firma) ---------- */
+.route{
+  position:relative;
+}
+.route::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:repeating-linear-gradient(to bottom, var(--gray-dark) 0 14px, transparent 14px 28px);
+  transform:translateX(-50%);
+  opacity:0.35;
+  display:none;
+}
+@media(min-width:980px){
+  .route::before{ display:block; }
+}
+.waypoint{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--mono);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ember);
+  margin-bottom:16px;
+}
+.waypoint::before{
+  content:"";
+  width:8px; height:8px;
+  border-radius:50%;
+  background:var(--gradient);
+  box-shadow:0 0 0 4px rgba(244,132,31,0.14);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  background:var(--black);
+  color:var(--cream);
+  font-family:'Rajdhani', sans-serif;
+  font-weight:500;
+  line-height:1.5;
+}
+
+h1,h2,h3,.display{
+  font-family:'Bebas Neue', sans-serif;
+  letter-spacing:0.03em;
+  font-weight:400;
+  line-height:1.05;
+}
+
+img{ max-width:100%; display:block; }
+a{ color:inherit; }
+button{ font-family:inherit; cursor:pointer; border:none; }
+
+.container{
+  max-width:1240px;
+  margin:0 auto;
+  padding:0 20px;
+}
+
+/* focus visibility for accessibility */
+a:focus-visible, button:focus-visible, summary:focus-visible{
+  outline:2px solid var(--gray);
+  outline-offset:2px;
+}
+
+/* ---------- stripe divider (elemento de firma) ---------- */
+.stripe-divider{
+  height:10px;
+  background:var(--gradient);
+  clip-path:polygon(0 0,100% 0,100% 100%,0% 100%);
+  transform:skewY(-1deg);
+  margin:0 0 -3px 0;
+}
+
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:rgba(11,11,12,0.94);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 20px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+}
+.brand img{
+  height:44px;
+  width:auto;
+  display:block;
+}
+footer .brand img{ height:56px; }
+
+.main-nav{
+  display:none;
+  align-items:center;
+  gap:30px;
+}
+.main-nav a{
+  font-family:var(--mono);
+  font-size:12.5px;
+  font-weight:500;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#c9c8c4;
+  text-decoration:none;
+  position:relative;
+  padding-bottom:3px;
+  transition:color .15s ease;
+}
+.main-nav a::after{
+  content:"";
+  position:absolute;
+  left:0; right:100%;
+  bottom:0;
+  height:1px;
+  background:var(--gradient);
+  transition:right .2s ease;
+}
+.main-nav a:hover{ color:var(--cream); }
+.main-nav a:hover::after{ right:0; }
+
+.nav-toggle{
+  display:flex;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--cream);
+  width:40px; height:40px;
+  border-radius:8px;
+  align-items:center;
+  justify-content:center;
+}
+.nav-toggle span, .nav-toggle span::before, .nav-toggle span::after{
+  content:"";
+  display:block;
+  width:18px; height:2px;
+  background:var(--cream);
+  position:relative;
+  transition:transform .2s ease, opacity .2s ease;
+}
+.nav-toggle span::before{ position:absolute; top:-6px; }
+.nav-toggle span::after{ position:absolute; top:6px; }
+#navCheck{ display:none; }
+#navCheck:checked ~ .nav-toggle span{ background:transparent; }
+#navCheck:checked ~ .nav-toggle span::before{ transform:rotate(45deg); top:0; }
+#navCheck:checked ~ .nav-toggle span::after{ transform:rotate(-45deg); top:0; }
+
+.mobile-nav{
+  max-height:0;
+  overflow:hidden;
+  background:var(--black-2);
+  border-bottom:1px solid var(--line);
+  transition:max-height .25s ease;
+}
+#navCheck:checked ~ .mobile-nav{ max-height:320px; }
+.mobile-nav a{
+  display:block;
+  padding:14px 20px;
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--cream);
+  text-decoration:none;
+  border-top:1px solid var(--line);
+}
+.mobile-nav a:first-child{ border-top:none; }
+
+@media(min-width:860px){
+  .main-nav{ display:flex; }
+  .nav-toggle, .mobile-nav{ display:none; }
+}
+.ship-pill{
+  display:none;
+  align-items:center;
+  gap:8px;
+  background:var(--black-3);
+  border:1px solid var(--line);
+  padding:6px 14px;
+  border-radius:999px;
+  font-size:13px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--cream);
+}
+.ship-pill .dot{
+  width:8px; height:8px; border-radius:50%;
+  background:var(--gradient);
+}
+.cart-btn{
+  position:relative;
+  background:var(--black-3);
+  border:1px solid var(--line);
+  color:var(--cream);
+  padding:10px 16px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:'Rajdhani',sans-serif;
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:0.03em;
+  transition:border-color .15s ease;
+}
+.cart-btn:hover{ border-color:var(--gray); }
+.cart-count{
+  background:var(--gradient);
+  color:#000;
+  font-weight:700;
+  font-size:12px;
+  min-width:20px;
+  height:20px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 4px;
+}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;
+  padding:120px 0 76px;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 12% 10%, rgba(226,35,26,0.22), transparent 55%),
+    radial-gradient(ellipse at 88% -6%, rgba(244,132,31,0.20), transparent 50%),
+    var(--black);
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:repeating-linear-gradient(115deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 46px);
+  pointer-events:none;
+}
+.hero-marquee{
+  position:relative;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:var(--black-2);
+  overflow:hidden;
+  white-space:nowrap;
+}
+.hero-marquee .track{
+  display:inline-flex;
+  animation:marquee 26s linear infinite;
+}
+.hero-marquee span{
+  font-family:var(--mono);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--gray);
+  padding:11px 26px;
+  border-right:1px solid var(--line);
+}
+.hero-marquee span em{ color:var(--ember); font-style:normal; }
+@keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+
+.hero-grid{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:44px;
+  align-items:end;
+}
+.hero-inner{ max-width:720px; }
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-family:var(--mono);
+  font-size:12.5px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--ember);
+  font-weight:700;
+  margin-bottom:22px;
+}
+.eyebrow::before{
+  content:"";
+  width:26px; height:2px;
+  background:var(--gradient);
+}
+.hero h1{
+  font-size:clamp(48px, 8.6vw, 96px);
+  color:var(--cream);
+}
+.hero h1 span{
+  background:var(--gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hero p{
+  margin-top:20px;
+  font-size:18.5px;
+  color:#c9c8c4;
+  max-width:520px;
+}
+.hero-ctas{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:34px;
+}
+.btn-primary{
+  background:var(--gradient);
+  color:#000;
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  padding:15px 28px;
+  border-radius:999px;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition:filter .15s ease, transform .15s ease;
+}
+.btn-primary:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+.btn-ghost{
+  border:1px solid var(--line);
+  color:var(--cream);
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  padding:15px 28px;
+  border-radius:999px;
+  text-decoration:none;
+  transition:border-color .15s ease;
+}
+.btn-ghost:hover{ border-color:var(--gray); }
+
+.hero-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:28px;
+}
+.hero-tag{
+  border:1px solid var(--line);
+  padding:8px 16px;
+  border-radius:999px;
+  font-size:13px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:var(--cream);
+  font-weight:600;
+}
+.hero-tag.accent{
+  border-color:transparent;
+  background:var(--gradient);
+  color:#000;
+  font-weight:700;
+}
+
+.hero-stats{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:0;
+  border-top:1px solid var(--line);
+  padding-top:28px;
+}
+.hero-stats div{ padding-right:16px; }
+.hero-stats div + div{ border-left:1px solid var(--line); padding-left:20px; }
+.hero-stats .num{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:44px;
+  background:var(--gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  line-height:1;
+}
+.hero-stats .lbl{
+  margin-top:6px;
+  font-family:var(--mono);
+  font-size:11.5px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--gray);
+}
+@media(min-width:980px){
+  .hero-grid{ grid-template-columns:1.3fr 0.9fr; }
+}
+
+/* ---------- landing sections (compartido) ---------- */
+.landing-section{ padding:88px 0; }
+.landing-section .container{ max-width:1160px; }
+.section-head{ max-width:640px; margin-bottom:52px; }
+.section-head h2{ font-size:clamp(32px,4.4vw,50px); color:var(--cream); margin-top:6px; }
+.section-head p{ margin-top:14px; font-size:16.5px; color:#c9c8c4; }
+
+/* ---------- ventajas ---------- */
+.advantages{ background:var(--black-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.adv-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.adv-card{
+  background:var(--black-2);
+  padding:30px 26px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  transition:background .15s ease;
+}
+.adv-card:hover{ background:var(--black-3); }
+.adv-icon{
+  width:44px; height:44px;
+  border-radius:10px;
+  background:var(--gradient);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+}
+.adv-card h3{ font-size:22px; color:var(--cream); }
+.adv-card p{ font-size:14.5px; color:#a9a8a4; }
+.adv-tag{
+  margin-top:auto;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ember);
+}
+@media(min-width:700px){ .adv-grid{ grid-template-columns:repeat(2,1fr); } }
+@media(min-width:1050px){ .adv-grid{ grid-template-columns:repeat(4,1fr); } }
+
+/* ---------- testimonios ---------- */
+.testi-track{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:22px;
+}
+.testi-card{
+  background:var(--black-2);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:28px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.testi-stars{ color:var(--ember); font-size:15px; letter-spacing:2px; }
+.testi-quote{ font-size:16.5px; color:var(--cream); line-height:1.55; }
+.testi-who{ display:flex; align-items:center; gap:12px; margin-top:auto; }
+.testi-avatar{
+  width:42px; height:42px;
+  border-radius:50%;
+  background:var(--gradient);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:18px;
+  color:#000;
+  flex:none;
+}
+.testi-name{ font-weight:700; color:var(--cream); font-size:14.5px; }
+.testi-bike{ font-family:var(--mono); font-size:11.5px; color:var(--gray); text-transform:uppercase; letter-spacing:0.06em; }
+@media(min-width:760px){ .testi-track{ grid-template-columns:repeat(2,1fr); } }
+@media(min-width:1050px){ .testi-track{ grid-template-columns:repeat(3,1fr); } }
+
+/* ---------- contacto ---------- */
+.contact{ background:var(--black-2); border-top:1px solid var(--line); }
+.contact-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:40px;
+}
+.contact-card{
+  background:var(--black-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:36px;
+}
+.contact-card h3{ font-size:26px; color:var(--cream); margin-bottom:10px; }
+.contact-card p{ font-size:15px; color:#a9a8a4; margin-bottom:26px; }
+.contact-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:16px 0;
+  border-top:1px solid var(--line);
+}
+.contact-row:first-of-type{ border-top:none; }
+.contact-row .ico{
+  width:38px; height:38px;
+  border-radius:9px;
+  background:var(--black-2);
+  border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+  flex:none;
+  font-size:16px;
+}
+.contact-row .lbl{ font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); }
+.contact-row .val{ font-size:15px; color:var(--cream); font-weight:600; }
+.contact-map{
+  border-radius:var(--radius);
+  border:1px solid var(--line);
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0 12px, transparent 12px 24px),
+    var(--black-3);
+  min-height:280px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  text-align:center;
+  padding:30px;
+}
+.contact-map .pin{ font-size:34px; }
+.contact-map p{ color:#a9a8a4; font-size:14px; max-width:280px; }
+@media(min-width:900px){ .contact-grid{ grid-template-columns:1fr 1fr; } }
+
+/* ---------- category nav ---------- */
+.cat-nav-wrap{
+  position:sticky;
+  top:65px;
+  z-index:40;
+  background:var(--black);
+  border-bottom:1px solid var(--line);
+}
+.cat-nav{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:14px 20px;
+  scrollbar-width:none;
+}
+.cat-nav::-webkit-scrollbar{ display:none; }
+.cat-btn{
+  flex:none;
+  background:transparent;
+  border:1px solid var(--line);
+  color:#bdbcb8;
+  padding:9px 18px;
+  border-radius:999px;
+  font-family:'Rajdhani',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  transition:all .15s ease;
+}
+.cat-btn:hover{ border-color:var(--gray); color:var(--cream); }
+.cat-btn.active{
+  background:var(--gradient);
+  border-color:transparent;
+  color:#000;
+}
+
+/* ---------- product grid ---------- */
+.catalog{ padding:44px 0 90px; }
+.section-heading{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  margin:48px 0 22px;
+}
+.section-heading:first-child{ margin-top:0; }
+.section-heading h2{
+  font-size:32px;
+  color:var(--cream);
+}
+.section-heading .line{
+  flex:1;
+  height:1px;
+  background:var(--line);
+}
+.section-heading .count{
+  font-size:13px;
+  color:var(--gray);
+  font-weight:700;
+  letter-spacing:0.05em;
+}
+
+.product-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(258px, 1fr));
+  gap:22px;
+}
+
+.card{
+  background:var(--black-2);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  transition:border-color .15s ease, transform .15s ease;
+}
+.card:hover{ border-color:var(--gray); transform:translateY(-2px); }
+
+.img-slot{
+  aspect-ratio:4/3;
+  border-bottom:1px dashed var(--line);
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0 12px, transparent 12px 24px),
+    var(--black-3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:16px;
+}
+.img-slot span{
+  font-size:12px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#6f6f74;
+  font-weight:600;
+}
+.img-slot img{ width:100%; height:100%; object-fit:cover; }
+
+.card-body{
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  flex:1;
+}
+.card-badge{
+  align-self:flex-start;
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--gray);
+  border:1px solid var(--gray);
+  padding:3px 9px;
+  border-radius:999px;
+  font-weight:700;
+}
+.card-title{
+  font-size:22px;
+  color:var(--cream);
+}
+.card-price{
+  font-size:24px;
+  font-weight:700;
+  background:var(--gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  font-family:'Rajdhani',sans-serif;
+}
+.card-specs{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:14px;
+  color:#c9c8c4;
+}
+.card-specs li::before{
+  content:"— ";
+  color:var(--gray);
+}
+.card-apps{
+  font-size:13px;
+  color:#a9a8a4;
+  border-top:1px dashed var(--line);
+  padding-top:8px;
+}
+.card-apps summary{
+  cursor:pointer;
+  font-weight:700;
+  color:var(--cream);
+  letter-spacing:0.02em;
+  list-style:none;
+}
+.card-apps summary::-webkit-details-marker{ display:none; }
+.card-apps summary::after{ content:" +"; color:var(--gray); }
+.card-apps[open] summary::after{ content:" −"; }
+.card-apps ul{
+  margin-top:8px;
+  columns:2;
+  column-gap:14px;
+  list-style:none;
+  font-size:12.5px;
+  line-height:1.6;
+}
+
+.qty-row{
+  margin-top:auto;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.size-picker{
+  margin-top:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  border-top:1px dashed var(--line);
+  padding-top:12px;
+}
+.size-select{
+  width:100%;
+  background:var(--black-3);
+  color:var(--cream);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:9px 10px;
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0.02em;
+  appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239a9a9d' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  background-size:16px;
+}
+.size-select:focus-visible{ outline:2px solid var(--gray); outline-offset:2px; }
+.color-select{
+  width:100%;
+  background:var(--black-3);
+  color:var(--cream);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:9px 10px;
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0.02em;
+  appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239a9a9d' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  background-size:16px;
+  transition:border-color .15s ease;
+}
+.color-select:focus-visible{ outline:2px solid var(--gray); outline-offset:2px; }
+.app-select{
+  width:100%;
+  background:var(--black-3);
+  color:var(--cream);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:9px 10px;
+  font-family:'Rajdhani', sans-serif;
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0.02em;
+  appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239a9a9d' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  background-size:16px;
+}
+.app-select:focus-visible{ outline:2px solid var(--gray); outline-offset:2px; }
+.size-picker .qty-row{
+  margin-top:0;
+  border-top:none;
+  padding-top:0;
+}
+.stepper{
+  display:flex;
+  align-items:center;
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+}
+.stepper button{
+  background:var(--black-3);
+  color:var(--cream);
+  width:32px; height:32px;
+  font-size:18px;
+  font-weight:700;
+}
+.stepper button:hover{ background:var(--red); }
+.stepper .qty-val{
+  width:34px;
+  text-align:center;
+  font-weight:700;
+  font-size:15px;
+}
+.add-btn{
+  flex:1;
+  background:var(--gradient);
+  color:#000;
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  padding:10px 12px;
+  border-radius:8px;
+  transition:filter .15s ease;
+}
+.add-btn:hover{ filter:brightness(1.08); }
+.add-btn.added{ background:var(--black-3); color:var(--gray); }
+
+/* ---------- cart drawer ---------- */
+.overlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+  z-index:90;
+}
+.overlay.open{ opacity:1; pointer-events:auto; }
+
+.drawer{
+  position:fixed;
+  top:0; right:0;
+  height:100%;
+  width:min(420px, 100%);
+  background:var(--black-2);
+  border-left:1px solid var(--line);
+  transform:translateX(100%);
+  transition:transform .25s ease;
+  z-index:91;
+  display:flex;
+  flex-direction:column;
+}
+.drawer.open{ transform:translateX(0); }
+.drawer-header{
+  padding:20px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.drawer-header h2{ font-size:26px; }
+.drawer-close{
+  background:var(--black-3);
+  color:var(--cream);
+  width:34px; height:34px;
+  border-radius:50%;
+  font-size:18px;
+}
+.drawer-body{
+  flex:1;
+  overflow-y:auto;
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.empty-cart{
+  color:#8b8a86;
+  font-size:15px;
+  text-align:center;
+  margin-top:60px;
+}
+.cart-item{
+  display:flex;
+  gap:12px;
+  border-bottom:1px solid var(--line);
+  padding-bottom:14px;
+}
+.cart-item .thumb{
+  width:56px; height:56px;
+  border-radius:6px;
+  background:var(--black-3);
+  border:1px dashed var(--line);
+  flex:none;
+  overflow:hidden;
+}
+.cart-item .thumb img{ width:100%; height:100%; object-fit:cover; }
+.cart-item .info{ flex:1; }
+.cart-item .info .name{ font-weight:700; color:var(--cream); font-size:15px; }
+.cart-item .info .price{ font-size:13px; color:#a9a8a4; }
+.cart-item .row2{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:8px;
+}
+.remove-link{
+  background:none;
+  color:var(--red);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+}
+.remove-link:hover{ text-decoration:underline; }
+
+.drawer-footer{
+  border-top:1px solid var(--line);
+  padding:18px 20px 22px;
+}
+.total-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin-bottom:14px;
+}
+.total-row .label{ font-size:15px; color:#c9c8c4; text-transform:uppercase; letter-spacing:0.05em; }
+.total-row .amount{ font-size:28px; font-family:'Bebas Neue',sans-serif; color:var(--cream); }
+.whatsapp-btn{
+  width:100%;
+  background:var(--gradient);
+  color:#000;
+  font-weight:700;
+  font-size:16px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  padding:15px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  text-decoration:none;
+}
+.whatsapp-btn:hover{ filter:brightness(1.08); }
+.whatsapp-btn svg{ width:20px; height:20px; }
+.drawer-footer .note{
+  font-size:12px;
+  color:#8b8a86;
+  text-align:center;
+  margin-top:10px;
+}
+
+/* ---------- footer ---------- */
+footer{
+  background:var(--black-2);
+  border-top:1px solid var(--line);
+  padding:46px 0 30px;
+}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.3fr 1fr 1fr;
+  gap:32px;
+}
+footer h3{
+  font-size:20px;
+  color:var(--cream);
+  margin-bottom:12px;
+}
+footer p, footer li{
+  color:#a9a8a4;
+  font-size:14.5px;
+}
+footer ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.foot-whatsapp{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+  color:var(--gray);
+  font-weight:700;
+  text-decoration:none;
+}
+.foot-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:var(--black-3);
+  border:1px solid var(--line);
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  margin-top:14px;
+}
+.foot-bottom{
+  margin-top:36px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+  text-align:center;
+  font-size:12.5px;
+  color:#6f6f74;
+}
+
+/* ---------- floating whatsapp button (mobile) ---------- */
+.floating-wa{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:60;
+  background:var(--gradient);
+  color:#000;
+  width:58px; height:58px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
+}
+.floating-wa svg{ width:26px; height:26px; }
+
+@media(min-width:640px){
+  .ship-pill{ display:flex; }
+}
+@media(max-width:820px){
+  .footer-grid{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOPBAR ============ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#" class="brand"><img src="images/logomdm.png" alt="Midemarc"></a>
+    <nav class="main-nav">
+      <a href="#salida">Inicio</a>
+      <a href="#ventajas">Ventajas</a>
+      <a href="#voces-de-ruta">Testimonios</a>
+      <a href="#catalogo">Catálogo</a>
+      <a href="#llegada">Contacto</a>
+    </nav>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span class="ship-pill"><span class="dot"></span>Envío a todo el país</span>
+      <button class="cart-btn" id="openCartBtn" aria-label="Abrir carrito">
+        🏍️ Carrito <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <input type="checkbox" id="navCheck">
+      <label class="nav-toggle" for="navCheck" aria-label="Abrir menú"><span></span></label>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#salida">Inicio</a>
+    <a href="#ventajas">Ventajas</a>
+    <a href="#voces-de-ruta">Testimonios</a>
+    <a href="#catalogo">Catálogo</a>
+    <a href="#llegada">Contacto</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="salida">
+  <div class="container">
+    <div class="waypoint">Salida — Km 0</div>
+    <div class="hero-grid">
+      <div class="hero-inner">
+        <span class="eyebrow">Distribuidora oficial · Moto todo terreno</span>
+        <h1>Equipamiento <span>premium</span> para quien no se baja de la ruta</h1>
+        <p>Fundas, indumentaria racing, protección y personalización pensados por y para motoqueros. Calidad de distribuidor, trato directo, envío a todo el país.</p>
+        <div class="hero-ctas">
+          <a href="#catalogo" class="btn-primary">Ver catálogo →</a>
+          <a href="#llegada" class="btn-ghost">Hablar por WhatsApp</a>
+        </div>
+        <div class="hero-tags">
+          <span class="hero-tag accent">🚚 Envío a todo el país</span>
+          <span class="hero-tag">Pedidos por WhatsApp</span>
+          <span class="hero-tag">Pago a coordinar</span>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div><div class="num">+180</div><div class="lbl">Aplicaciones de fundas</div></div>
+        <div><div class="num">5</div><div class="lbl">Líneas de producto</div></div>
+        <div><div class="num">100%</div><div class="lbl">País cubierto</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="hero-marquee">
+  <div class="track">
+    <span>FUNDAS ANTIDESLIZANTES <em>·</em></span>
+    <span>INDUMENTARIA RACING <em>·</em></span>
+    <span>ACCESORIOS DE VIAJE <em>·</em></span>
+    <span>CUELLOS Y PROTECCIÓN <em>·</em></span>
+    <span>PERSONALIZACIÓN <em>·</em></span>
+    <span>ENVÍOS A TODO EL PAÍS <em>·</em></span>
+    <span>FUNDAS ANTIDESLIZANTES <em>·</em></span>
+    <span>INDUMENTARIA RACING <em>·</em></span>
+    <span>ACCESORIOS DE VIAJE <em>·</em></span>
+    <span>CUELLOS Y PROTECCIÓN <em>·</em></span>
+    <span>PERSONALIZACIÓN <em>·</em></span>
+    <span>ENVÍOS A TODO EL PAÍS <em>·</em></span>
+  </div>
+</div>
+
+<div class="route">
+
+<!-- ============ VENTAJAS ============ -->
+<section class="landing-section advantages" id="ventajas">
+  <div class="container">
+    <div class="waypoint">Ventajas — Km 40</div>
+    <div class="section-head reveal">
+      <h2>Por qué elegir Midemarc</h2>
+      <p>No vendemos accesorios genéricos: distribuimos equipamiento pensado para el uso real, con la variedad de aplicaciones que un motoquero necesita para encontrar la suya.</p>
+    </div>
+    <div class="adv-grid reveal-stagger">
+      <div class="adv-card">
+        <div class="adv-icon">🛡️</div>
+        <h3>Calidad de distribuidor</h3>
+        <p>Materiales reforzados —cordura, laycra, algodón peinado— pensados para aguantar ruta, pista y uso diario.</p>
+        <span class="adv-tag">Materiales</span>
+      </div>
+      <div class="adv-card">
+        <div class="adv-icon">🎯</div>
+        <h3>Aplicación exacta</h3>
+        <p>Catálogo organizado por modelo de moto, para que encuentres la funda o accesorio que realmente calza en la tuya.</p>
+        <span class="adv-tag">Compatibilidad</span>
+      </div>
+      <div class="adv-card">
+        <div class="adv-icon">🚚</div>
+        <h3>Llega a todo el país</h3>
+        <p>Coordinamos envío a cualquier provincia. El pedido se arma en la web y se cierra directo por WhatsApp.</p>
+        <span class="adv-tag">Logística</span>
+      </div>
+      <div class="adv-card">
+        <div class="adv-icon">🏁</div>
+        <h3>Para toda la tribu</h3>
+        <p>Touring, enduro, urbano o pista: líneas de producto para cada estilo de manejo y cada tipo de moto.</p>
+        <span class="adv-tag">Variedad</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIOS ============ -->
+<section class="landing-section" id="voces-de-ruta">
+  <div class="container">
+    <div class="waypoint">Voces de ruta — Km 80</div>
+    <div class="section-head reveal">
+      <h2>Lo que dicen los que ya rodaron con Midemarc</h2>
+      <p>Testimonios de ejemplo — los vamos a reemplazar por reseñas reales de clientes.</p>
+    </div>
+    <div class="testi-track reveal-stagger">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">La funda le quedó como hecha a medida y en dos días ya la tenía en casa. Se nota que conocen las motos.</p>
+        <div class="testi-who">
+          <div class="testi-avatar">F</div>
+          <div>
+            <div class="testi-name">Fede R.</div>
+            <div class="testi-bike">XTZ 250 · Buenos Aires</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">Compré la campera softshell para un viaje largo y aguantó lluvia y frío sin problema. Volví a comprar cuellos para todo el grupo.</p>
+        <div class="testi-who">
+          <div class="testi-avatar">C</div>
+          <div>
+            <div class="testi-name">Cintia M.</div>
+            <div class="testi-bike">Transalp 600 · Córdoba</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">Pedí por WhatsApp, me asesoraron con el talle y llegó todo perfecto al taller. Así se compran accesorios de moto.</p>
+        <div class="testi-who">
+          <div class="testi-avatar">J</div>
+          <div>
+            <div class="testi-name">Juan P.</div>
+            <div class="testi-bike">Rouser 220F · Mendoza</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACTO ============ -->
+<section class="landing-section contact" id="llegada">
+  <div class="container">
+    <div class="waypoint">Llegada — Destino final</div>
+    <div class="section-head reveal">
+      <h2>Armemos tu pedido</h2>
+      <p>Elegí tus productos en el catálogo o escribinos directo. Coordinamos talle, envío y forma de pago por WhatsApp.</p>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="contact-card">
+        <h3>Hablemos por WhatsApp</h3>
+        <p>Respondemos consultas de stock, aplicaciones y envíos a todo el país.</p>
+        <div class="contact-row">
+          <div class="ico">💬</div>
+          <div><div class="lbl">WhatsApp</div><div class="val">+54 9 11 4065-3692</div></div>
+        </div>
+        <div class="contact-row">
+          <div class="ico">🚚</div>
+          <div><div class="lbl">Envíos</div><div class="val">A todo el país</div></div>
+        </div>
+        <div class="contact-row">
+          <div class="ico">🛒</div>
+          <div><div class="lbl">Pedido</div><div class="val">Se arma en la web y se cierra por WhatsApp</div></div>
+        </div>
+        <a href="https://wa.me/5491140653692" target="_blank" class="btn-primary" style="margin-top:24px;">Escribinos ahora →</a>
+      </div>
+      <div class="contact-map">
+        <div class="pin">📍</div>
+        <p>Distribución a todo el país. Coordinamos el punto de envío o retiro según tu ubicación.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /route -->
+
+<!-- ============ CATEGORY NAV ============ -->
+<div class="cat-nav-wrap" id="catalogo">
+  <nav class="cat-nav" id="catNav"></nav>
+</div>
+
+<!-- ============ CATALOG ============ -->
+<main class="container catalog">
+  <div id="catalogSections"></div>
+</main>
+
+<!-- ============ CART OVERLAY + DRAWER ============ -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="cartDrawer" aria-label="Carrito de compras">
+  <div class="drawer-header">
+    <h2>Tu pedido</h2>
+    <button class="drawer-close" id="closeCartBtn" aria-label="Cerrar carrito">✕</button>
+  </div>
+  <div class="drawer-body" id="cartBody">
+    <p class="empty-cart">Todavía no agregaste productos.</p>
+  </div>
+  <div class="drawer-footer">
+    <div class="total-row">
+      <span class="label">Total</span>
+      <span class="amount" id="cartTotal">$0</span>
+    </div>
+    <a href="#" target="_blank" class="whatsapp-btn" id="whatsappBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.3c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.1.8.8-3-.2-.3C3.5 14.4 3 13.2 3 12c0-4.9 4-9 9-9s9 4.1 9 9-4 9-9 9z"/></svg>
+      Enviar pedido por WhatsApp
+    </a>
+    <p class="note">Se abrirá WhatsApp con el detalle de tu pedido listo para enviar.</p>
+  </div>
+</aside>
+
+<!-- ============ FLOATING WHATSAPP ============ -->
+<a class="floating-wa" id="floatingWa" href="https://wa.me/5491140653692" target="_blank" aria-label="Escribinos por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.3c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.1.8.8-3-.2-.3C3.5 14.4 3 13.2 3 12c0-4.9 4-9 9-9s9 4.1 9 9-4 9-9 9z"/></svg>
+</a>
+
+<!-- ============ FOOTER ============ -->
+<div class="stripe-divider"></div>
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <div class="brand" style="margin-bottom:14px;"><img src="images/logomdm.png" alt="Midemarc"></div>
+      <p>Indumentaria y accesorios para motociclismo. Calidad pensada para el uso diario y para la pista.</p>
+      <span class="foot-badge">🚚 Envío a todo el país</span>
+    </div>
+    <div>
+      <h3>Pedidos</h3>
+      <p>Armá tu pedido en la web y coordinalo directo por WhatsApp.</p>
+      <a class="foot-whatsapp" href="https://wa.me/5491140653692" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.3c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.1.8.8-3-.2-.3C3.5 14.4 3 13.2 3 12c0-4.9 4-9 9-9s9 4.1 9 9-4 9-9 9z"/></svg>
+        +54 9 11 4065-3692
+      </a>
+    </div>
+    <div>
+      <h3>Categorías</h3>
+      <ul id="footCatList"></ul>
+    </div>
+  </div>
+  <div class="foot-bottom container">© <span id="year"></span> Midemarc — Todos los derechos reservados.</div>
+</footer>
+
+<script>
+/* =========================================================
+   MIDEMARC — datos y lógica del sitio
+   =========================================================
+   PARA MODIFICAR PRECIOS O DESCRIPCIONES:
+   Buscá el producto por su "id" dentro del array PRODUCTS
+   de más abajo y editá los campos "price", "name", "specs"
+   o "desc". Guardá el archivo y refrescá el navegador.
+
+   PARA AGREGAR UNA IMAGEN REAL A UN PRODUCTO:
+   1) Poné el archivo de imagen en una carpeta "images"
+      al lado de este index.html (ej: images/campera.jpg)
+   2) En el producto correspondiente, cambiá:
+         image: null
+      por:
+         image: "images/campera.jpg"
+   Si "image" queda en null, se muestra el espacio reservado
+   con el texto "Imagen del producto".
+   ========================================================= */
+
+const CATEGORIES = [
+  { id: "fundas",       name: "Fundas de Asiento" },
+  { id: "indumentaria", name: "Indumentaria" },
+  { id: "viaje",         name: "Accesorios de Viaje" },
+  { id: "cuellos",       name: "Cuellos y Protección" },
+  { id: "otros",         name: "Personalización y Otros" },
+];
+
+const PRODUCTS = [
+  // ---------- FUNDAS DE ASIENTO ----------
+  {
+    id: "funda-lisa-g1", category: "fundas",
+    name: "Funda de Asiento Antideslizante Lisa", badge: "Grupo 1",
+    price: 15416, image: "images/hf1.png",
+    specs: ["Antideslizante", "Terminación lisa"],
+    applications: ["XR 300 E","CRF 250L-230","CR 80","XR 250 (84'-95')","CB 190 R","XRL 125","NAVI 110","YBR 250","TTR 230","XT 225 BRA","DT 125-175-250","SZRR 150","YZF 250 (11-13)","XTZ 250 - 22'","SKUA V6","RX 150 Z6","CORVEN TRIAX 150 R3 - 250","STRADA VC 150","JHIANSHE 125 - JS","GILERA RALLY SMX 400 2013","KELLER 260 ENDURO","DAKAR 200 MOTOMEL","HERO XPULSE 200","KX 125-250 (92-96)","KE 100","DR 125-250-350","INAZUMA 250"]
+  },
+  {
+    id: "funda-est-g1", category: "fundas",
+    name: "Funda de Asiento Antideslizante Estampada", badge: "Grupo 1",
+    price: 17687, image: "images/hfs1.png",
+    specs: ["Antideslizante", "Terminación estampada"],
+    applications: ["XR 300 E","CRF 250L-230","CR 80","XR 250 (84'-95')","CB 190 R","XRL 125","NAVI 110","YBR 250","TTR 230","XT 225 BRA","DT 125-175-250","SZRR 150","YZF 250 (11-13)","XTZ 250 - 22'","SKUA V6","RX 150 Z6","CORVEN TRIAX 150 R3 - 250","STRADA VC 150","JHIANSHE 125 - JS","GILERA RALLY SMX 400 2013","KELLER 260 ENDURO","DAKAR 200 MOTOMEL","HERO XPULSE 200","KX 125-250 (92-96)","KE 100","DR 125-250-350","INAZUMA 250"]
+  },
+  {
+    id: "funda-lisa-g2", category: "fundas",
+    name: "Funda de Asiento Antideslizante Lisa", badge: "Grupo 2",
+    price: 17687, image: "images/hf1.png",
+    specs: ["Antideslizante", "Terminación lisa"],
+    applications: ["Africa Twin XRV 750 - 90/03","NX 125/150","Transalp 600","CB 250 Nighthawk","Elite 150 (86-90)","Super Tenere 750","XT 350","TTR 600 (97-06)","FZ 600 Fazer 08'","FZ - S Fi v3.0","KLX 250r 94-86","KLX 300r 97-07","KX 250 - 91","KLX 250 S 09-20","DR 650 RS 90-95","DR 650 RSE 91-95","GS 500E 04-09","Beta RR 250-300-350-390-400-450 13-16","Beta Arrow 150 Tempo","Gilera 125 QM","Gilera Super 125","Motomel SR 200 R","Motomel VX 150"]
+  },
+  {
+    id: "funda-est-g2", category: "fundas",
+    name: "Funda de Asiento Antideslizante Estampada", badge: "Grupo 2",
+    price: 20938, image: "images/hfs1.png",
+    specs: ["Antideslizante", "Terminación estampada"],
+    applications: ["Africa Twin XRV 750 - 90/03","NX 125/150","Transalp 600","CB 250 Nighthawk","Elite 150 (86-90)","Super Tenere 750","XT 350","TTR 600 (97-06)","FZ 600 Fazer 08'","FZ - S Fi v3.0","KLX 250r 94-86","KLX 300r 97-07","KX 250 - 91","KLX 250 S 09-20","DR 650 RS 90-95","DR 650 RSE 91-95","GS 500E 04-09","Beta RR 250-300-350-390-400-450 13-16","Beta Arrow 150 Tempo","Gilera 125 QM","Gilera Super 125","Motomel SR 200 R","Motomel VX 150"]
+  },
+  {
+    id: "funda-lisa-g3", category: "fundas",
+    name: "Funda de Asiento Antideslizante Lisa", badge: "Grupo 3",
+    price: 13805, image: "images/hf1.png",
+    specs: ["Antideslizante", "Terminación lisa"],
+    applications: ["TORNADO","BROSS","XR 125-150-190L","CBX-CB250","NX400","POP","CG","INVICTA","CB1","CR 80 (96 A 02)","AX 100","GN 125 F","EN 125","GIXXER 150","CORVEN DAX 70","ENERGY","MIRAGE","HUNTER 150","SMASH 110","XTZ 125-250","YBR 125","FZ VIEJO","YZ 125-250 (96-98)","YZ 85 (02-20)","CRYPTON","NEW CRYPTON","ZAN HOT 90","NS 200 (DOBLE)","ROUSER 180 (DOBLE)","ROUSER 220F (DOBLE)","MOTOMEL CG SERIES 2","KELLER CRONO CLASSIC"]
+  },
+  {
+    id: "funda-est-g3", category: "fundas",
+    name: "Funda de Asiento Antideslizante Estampada", badge: "Grupo 3",
+    price: 15416, image: "images/hfs1.png",
+    specs: ["Antideslizante", "Terminación estampada"],
+    applications: ["TORNADO","BROSS","XR 125-150-190L","CBX-CB250","NX400","POP","CG","INVICTA","CB1","CR 80 (96 A 02)","AX 100","GN 125 F","EN 125","GIXXER 150","CORVEN DAX 70","ENERGY","MIRAGE","HUNTER 150","SMASH 110","XTZ 125-250","YBR 125","FZ VIEJO","YZ 125-250 (96-98)","YZ 85 (02-20)","CRYPTON","NEW CRYPTON","ZAN HOT 90","NS 200 (DOBLE)","ROUSER 180 (DOBLE)","ROUSER 220F (DOBLE)","MOTOMEL CG SERIES 2","KELLER CRONO CLASSIC"]
+  },
+
+  // ---------- INDUMENTARIA ----------
+  {
+    id: "chomba-classic", category: "indumentaria",
+    name: "Chomba Classic", price: 20000, image: "images/choclas.png",
+    sizes: ["S","M","L","XL","XXL"],
+    colors: ["negro","blanco","rojo","azul","verde"],
+    images: {
+      negro:  "images/choclas-negro.png",
+      blanco: "images/choclas-blanco.png",
+      rojo:   "images/choclas-rojo.png",
+      azul:   "images/choclas-azul.png",
+      verde:  "images/choclas-verde.png"
+    },
+    specs: ["Tela piqué","Confeccionada","1 logo al frente","Diseños varios / propios"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Suzuki"]
+  },
+  {
+    id: "chomba-racing", category: "indumentaria",
+    name: "Chomba Racing", price: 24000, image: "images/chorac.png",
+    sizes: ["S","M","L","XL","XXL"],
+    colors: ["negro","blanco","rojo","azul","verde"],
+    images: {
+      negro:  "images/chorac-negro.png",
+      blanco: "images/chorac-blanco.png",
+      rojo:   "images/chorac-rojo.png",
+      azul:   "images/chorac-azul.png",
+      verde:  "images/chorac-verde.png"
+    },
+    specs: ["Tela piqué","Confeccionada","2 logos al frente","1 logo en cada manga","1 logo en la espalda"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Suzuki"]
+  },
+  {
+    id: "campera-algodon", category: "indumentaria",
+    name: "Campera Algodón", price: 38000, image: "images/campalgo.png",
+    desc: "Confeccionada en algodón con doble frisa, un tejido de alto gramaje que ofrece máximo abrigo y una suavidad excepcional en ambas caras. Retiene el calor de forma eficiente y resiste el uso diario y los lavados continuos.",
+    sizes: ["S","M","L","XL","XXL"],
+    colors: ["negro","blanco","rojo","azul",],
+    images: {
+      negro:  "images/campalgo-negro.png",
+      blanco: "images/campalgo-blanco.png",
+      rojo:   "images/campalgo-rojo.png",
+      azul:   "images/campalgo-azul.png",
+      
+    },
+    specs: ["Algodón peinado","Doble frizado","Con capucha","Confeccionada"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Ducati"]
+  },
+  {
+    id: "campera-softshell", category: "indumentaria",
+    name: "Campera SoftShell", price: 50000, image: "images/campsoftshel.png",
+    sizes: ["M","L","XL","XXL"],
+    
+    images: {
+      negro:  "images/campsoftshel-negro.png",
+      blanco: "images/campsoftshel-blanco.png",
+      rojo:   "images/campsoftshel-rojo.png",
+      azul:   "images/campsoftshel-azul.png",
+      verde:  "images/campsoftshel-verde.png"
+    },
+    specs: ["Cierre impermeable","Capucha desmontable"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Alpinestar"]
+  },
+  {
+    id: "remeras", category: "indumentaria",
+    name: "Remeras", price: 14000, image: "images/remealgo.png",
+    desc: "Remera de algodón peinado con estampado de marca, ideal para el uso diario o para acompañar el look racing.",
+    sizes: ["S","M","L","XL","XXL"],
+    colors: ["negro","blanco","rojo","azul","verde"],
+    images: {
+      negro:  "images/remealgo-negro.png",
+      blanco: "images/remealgo-blanco.png",
+      rojo:   "images/remealgo-rojo.png",
+      azul:   "images/remealgo-azul.png",
+      verde:  "images/remealgo-verde.png"
+    },
+    specs: ["Algodón peinado","Diseños de distintas marcas: Honda, KTM, Kawasaki, Yamaha y más"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Suzuki"]
+  },
+
+  // ---------- ACCESORIOS DE VIAJE ----------
+  {
+    id: "muslera", category: "viaje",
+    name: "Muslera 3 Bolsillos", price: 12000, image: "images/Musle.png",
+    specs: ["3 compartimientos","Cordura reforzada","Materiales duraderos","Diseños de distintas marcas"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Suzuki","BMW","Rouser","Gilera","Corven"]
+  },
+  {
+    id: "mochila-cordura", category: "viaje",
+    name: "Mochila Cordura Reforzada", price: 15000, image: "images/mochicor.png",
+    specs: ["Cordura reforzada","Diseños: Colapinto, HRC, YHM, SZK, KTM, KWS, ProTPR, RSR"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Suzuki","Franco Colapinto"]
+  },
+  {
+    id: "cubremanos", category: "viaje",
+    name: "Cubremanos Cordura", price: 9999, image: "images/cubrmancor.png",
+    specs: ["Impermeable","Abrigo forrado en matelassé","Cordura"]
+  },
+
+  // ---------- CUELLOS Y PROTECCIÓN ----------
+  {
+    id: "cuellos-argentina", category: "cuellos",
+    name: "Cuellos Argentina", price: 4000, image: "images/cuelloarg.png",
+    specs: ["Diseños alusivos a la Selección Argentina campeona del mundo","Elastisado"]
+  },
+  {
+    id: "cuellos-elastisados", category: "cuellos",
+    name: "Cuellos Elastisados", price: 4000, image: "images/Cuelasti.jpg",
+    specs: ["Elastisado","Diseños de marcas y pilotos: KTM, HRC, Yamaha, Suzuki y más"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Suzuki","BMW","Rouser","Gilera","Corven"]
+  },
+  {
+    id: "cuello-multiuso", category: "cuellos",
+    name: "Cuello Multiuso", price: 4000, image: "images/cuellomulti.png",
+    specs: ["Elastisado"],
+    applications: ["Protaper","Alpinestar","Honda","Fox","Yamaha","Bajaj","Yamaha 46","KTM","Kawasaki","Suzuki"]
+  },
+  {
+    id: "balaclava", category: "cuellos",
+    name: "Balaclava", price: 4250, image: "images/balaclava.jpg",
+    specs: ["Laycra","Elastisada","Varios modelos"],
+    applications: ["Honda","Yamaha","Kawasaki","KTM","Suzuki","BMW","Rouser","Gilera","Corven"]
+  },
+
+  // ---------- PERSONALIZACIÓN Y OTROS ----------
+  {
+    id: "porta-patente", category: "otros",
+    name: "Porta Patente", price: 10000, image: "images/portapat.png",
+    specs: ["Metal","Rebatible","Universal"]
+  },
+  {
+    id: "llaveros", category: "otros",
+    name: "Llaveros de Tiras", price: 1100, image: "images/llaverotira.png",
+    specs: ["Elastisado"]
+  },
+  {
+    id: "plancha-calcos", category: "otros",
+    name: "Plancha de Calcos", price: 5000, image: "images/plancalco.png",
+    specs: ["Adhesivo reforzado","Relieve","Laca UV","Precio por 1 plancha"]
+  },
+];
+
+/* Colores disponibles para prendas con talle. El "hex" se usa solo
+   como referencia visual del borde del desplegable al elegir color. */
+const COLORS = [
+  { slug:"negro",  label:"Negro",  hex:"#1a1a1c" },
+  { slug:"blanco", label:"Blanco", hex:"#f5f2ec" },
+  { slug:"rojo",   label:"Rojo",   hex:"#e2231a" },
+  { slug:"azul",   label:"Azul",   hex:"#1560c9" },
+  { slug:"verde",  label:"Verde",  hex:"#1f8a3d" },
+];
+
+const WHATSAPP_NUMBER = "5491140653692";
+
+/* ---------------- utilidades ---------------- */
+const fmt = n => "$" + n.toLocaleString("es-AR");
+
+let cart = {}; // { productId: qty }
+
+function getProduct(id){ return PRODUCTS.find(p => p.id === id); }
+
+/* Las prendas con talle se guardan en el carrito con clave "id::TALLE" o,
+   si además tienen color, "id::TALLE::COLOR". Esta función separa la clave
+   en { id, size, color } (size/color = null si no aplican). */
+function parseCartKey(key){
+  const [id, size, color, app] = key.split("::");
+  return { id, size: size || null, color: color || null, app: app || null };
+}
+
+function colorLabel(slug){
+  const c = COLORS.find(c => c.slug === slug);
+  return c ? c.label : slug;
+}
+
+/* ---------------- render: nav de categorías ---------------- */
+function renderCatNav(){
+  const nav = document.getElementById("catNav");
+  const footList = document.getElementById("footCatList");
+  const allBtn = document.createElement("button");
+  allBtn.className = "cat-btn active";
+  allBtn.textContent = "Todos";
+  allBtn.dataset.cat = "all";
+  nav.appendChild(allBtn);
+
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "cat-btn";
+    btn.textContent = cat.name;
+    btn.dataset.cat = cat.id;
+    nav.appendChild(btn);
+
+    const li = document.createElement("li");
+    li.textContent = cat.name;
+    footList.appendChild(li);
+  });
+
+  nav.addEventListener("click", e => {
+    const btn = e.target.closest(".cat-btn");
+    if(!btn) return;
+    nav.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const cat = btn.dataset.cat;
+    document.querySelectorAll(".cat-section").forEach(sec => {
+      sec.style.display = (cat === "all" || sec.dataset.cat === cat) ? "" : "none";
+    });
+    if(cat !== "all"){
+      document.getElementById("sec-" + cat).scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+  });
+}
+
+/* ---------------- render: catálogo ---------------- */
+function productCardHtml(p){
+  const imgHtml = p.image
+    ? `<img class="product-img" src="${p.image}" alt="${p.name}">`
+    : `<span>Imagen del producto</span>`;
+
+  const badgeHtml = p.badge ? `<span class="card-badge">${p.badge}</span>` : "";
+  const descHtml = p.desc ? `<p style="font-size:14px;color:#c9c8c4;">${p.desc}</p>` : "";
+  const specsHtml = p.specs && p.specs.length
+    ? `<ul class="card-specs">${p.specs.map(s => `<li>${s}</li>`).join("")}</ul>`
+    : "";
+  const appsHtml = p.applications && p.applications.length
+    ? `<details class="card-apps">
+         <summary>Ver aplicaciones (${p.applications.length})</summary>
+         <ul>${p.applications.map(a => `<li>${a}</li>`).join("")}</ul>
+       </details>`
+    : "";
+
+  const hasSizes = p.sizes && p.sizes.length;
+  const hasColors = p.colors && p.colors.length;
+  const hasApps = p.applications && p.applications.length;
+  const hasVariants = hasSizes || hasColors || hasApps;
+
+  const sizeSelectHtml = hasSizes
+    ? `<select class="size-select" aria-label="Elegir talle">
+         <option value="">Elegí un talle</option>
+         ${p.sizes.map(sz => `<option value="${sz}">Talle ${sz}</option>`).join("")}
+       </select>`
+    : "";
+
+  const colorSelectHtml = hasColors
+    ? `<select class="color-select" aria-label="Elegir color">
+         <option value="">Elegí un color</option>
+         ${p.colors.map(slug => `<option value="${slug}">${colorLabel(slug)}</option>`).join("")}
+       </select>`
+    : "";
+
+  const isFundas = p.category === "fundas";
+  const appPlaceholder = isFundas ? "Elegí tu moto" : "Elegí tu marca";
+  const appAriaLabel = isFundas ? "Elegir aplicación (modelo de moto)" : "Elegir marca";
+
+  const appSelectHtml = hasApps
+    ? `<select class="app-select" aria-label="${appAriaLabel}">
+         <option value="">${appPlaceholder}</option>
+         ${p.applications.map(a => `<option value="${a}">${a}</option>`).join("")}
+       </select>`
+    : "";
+
+  const controlsHtml = hasVariants
+    ? `<div class="size-picker">
+         ${sizeSelectHtml}
+         ${colorSelectHtml}
+         ${appSelectHtml}
+         <div class="qty-row">
+           <div class="stepper">
+             <button class="qty-minus" aria-label="Restar cantidad">−</button>
+             <span class="qty-val">1</span>
+             <button class="qty-plus" aria-label="Sumar cantidad">+</button>
+           </div>
+           <button class="add-btn add-btn-sizes">Agregar</button>
+         </div>
+       </div>`
+    : `<div class="qty-row">
+        <div class="stepper">
+          <button class="qty-minus" aria-label="Restar cantidad">−</button>
+          <span class="qty-val">1</span>
+          <button class="qty-plus" aria-label="Sumar cantidad">+</button>
+        </div>
+        <button class="add-btn">Agregar</button>
+      </div>`;
+
+  return `
+  <article class="card" data-id="${p.id}">
+    <div class="img-slot">${imgHtml}</div>
+    <div class="card-body">
+      ${badgeHtml}
+      <h3 class="card-title">${p.name}</h3>
+      <p class="card-price">${fmt(p.price)}</p>
+      ${descHtml}
+      ${specsHtml}
+      ${appsHtml}
+      ${controlsHtml}
+    </div>
+  </article>`;
+}
+
+function renderCatalog(){
+  const wrap = document.getElementById("catalogSections");
+  CATEGORIES.forEach(cat => {
+    const items = PRODUCTS.filter(p => p.category === cat.id);
+    if(!items.length) return;
+    const section = document.createElement("section");
+    section.className = "cat-section";
+    section.dataset.cat = cat.id;
+    section.id = "sec-" + cat.id;
+    section.innerHTML = `
+      <div class="section-heading">
+        <h2>${cat.name}</h2>
+        <div class="line"></div>
+        <span class="count">${items.length} productos</span>
+      </div>
+      <div class="product-grid">
+        ${items.map(productCardHtml).join("")}
+      </div>`;
+    wrap.appendChild(section);
+  });
+}
+
+/* ---------------- interacción de tarjetas (cantidad / agregar / color) ---------------- */
+function initCardInteractions(){
+  document.getElementById("catalogSections").addEventListener("change", e => {
+    if(!e.target.classList.contains("color-select")) return;
+    const card = e.target.closest(".card");
+    const p = getProduct(card.dataset.id);
+    const slug = e.target.value;
+    const img = card.querySelector(".product-img");
+
+    if(img){
+      const fallback = p.image;
+      const src = (p.images && p.images[slug]) ? p.images[slug] : fallback;
+      img.onerror = () => { img.onerror = null; img.src = fallback; };
+      img.src = src;
+    }
+
+    const meta = COLORS.find(c => c.slug === slug);
+    e.target.style.borderColor = meta ? meta.hex : "";
+  });
+
+  document.getElementById("catalogSections").addEventListener("click", e => {
+    const card = e.target.closest(".card");
+    if(!card) return;
+    const id = card.dataset.id;
+    const qtyEl = card.querySelector(".qty-val");
+
+    if(e.target.classList.contains("qty-plus")){
+      qtyEl.textContent = parseInt(qtyEl.textContent) + 1;
+      return;
+    }
+    if(e.target.classList.contains("qty-minus")){
+      const current = parseInt(qtyEl.textContent);
+      if(current > 1) qtyEl.textContent = current - 1;
+      return;
+    }
+
+    /* ---- productos CON variantes (talle, color y/o aplicación) ---- */
+    if(e.target.classList.contains("add-btn-sizes")){
+      const p = getProduct(id);
+      const sizeSelect = card.querySelector(".size-select");
+      const colorSelect = card.querySelector(".color-select");
+      const appSelect = card.querySelector(".app-select");
+
+      const size = sizeSelect ? sizeSelect.value : "";
+      const color = colorSelect ? colorSelect.value : "";
+      const app = appSelect ? appSelect.value : "";
+
+      if(sizeSelect && !size){
+        flashAdded(e.target, "Elegí un talle");
+        sizeSelect.focus();
+        return;
+      }
+      if(colorSelect && !color){
+        flashAdded(e.target, "Elegí un color");
+        colorSelect.focus();
+        return;
+      }
+      if(appSelect && !app){
+        flashAdded(e.target, p.category === "fundas" ? "Elegí tu moto" : "Elegí tu marca");
+        appSelect.focus();
+        return;
+      }
+
+      const qty = parseInt(qtyEl.textContent);
+      const key = `${id}::${size}::${color}::${app}`;
+      cart[key] = (cart[key] || 0) + qty;
+      qtyEl.textContent = 1;
+      if(sizeSelect) sizeSelect.value = "";
+      if(colorSelect){
+        colorSelect.value = "";
+        colorSelect.style.borderColor = "";
+      }
+      if(appSelect) appSelect.value = "";
+      const img = card.querySelector(".product-img");
+      if(img && p.image) img.src = p.image;
+      renderCart();
+      flashAdded(e.target);
+      openDrawer();
+      return;
+    }
+
+    /* ---- productos SIN talle ---- */
+    if(e.target.classList.contains("add-btn")){
+      const qty = parseInt(qtyEl.textContent);
+      cart[id] = (cart[id] || 0) + qty;
+      qtyEl.textContent = 1;
+      renderCart();
+      flashAdded(e.target);
+      openDrawer();
+    }
+  });
+}
+
+function flashAdded(btn, msg){
+  const original = btn.textContent;
+  btn.textContent = msg || "Agregado ✓";
+  btn.classList.add("added");
+  setTimeout(() => { btn.textContent = original; btn.classList.remove("added"); }, 1100);
+}
+
+/* ---------------- carrito ---------------- */
+function cartTotal(){
+  return Object.entries(cart).reduce((sum, [key, qty]) => {
+    const { id } = parseCartKey(key);
+    const p = getProduct(id);
+    return sum + (p ? p.price * qty : 0);
+  }, 0);
+}
+
+function cartItemCount(){
+  return Object.values(cart).reduce((a,b) => a+b, 0);
+}
+
+function renderCart(){
+  const body = document.getElementById("cartBody");
+  const entries = Object.entries(cart).filter(([,qty]) => qty > 0);
+
+  document.getElementById("cartCount").textContent = cartItemCount();
+  document.getElementById("cartTotal").textContent = fmt(cartTotal());
+
+  if(!entries.length){
+    body.innerHTML = `<p class="empty-cart">Todavía no agregaste productos.</p>`;
+  } else {
+    body.innerHTML = entries.map(([key, qty]) => {
+      const { id, size, color, app } = parseCartKey(key);
+      const p = getProduct(id);
+      const sizeTag = size ? ` — Talle ${size}` : "";
+      const colorTag = color ? ` — ${colorLabel(color)}` : "";
+      const appTag = app ? ` — ${app}` : "";
+      const thumbSrc = (color && p.images && p.images[color]) ? p.images[color] : p.image;
+      const thumbHtml = thumbSrc ? `<img src="${thumbSrc}" alt="" onerror="this.onerror=null;this.src='${p.image || ""}';">` : "";
+      return `
+      <div class="cart-item" data-id="${key}">
+        <div class="thumb">${thumbHtml}</div>
+        <div class="info">
+          <div class="name">${p.name}${p.badge ? " · " + p.badge : ""}${sizeTag}${colorTag}${appTag}</div>
+          <div class="price">${fmt(p.price)} c/u</div>
+          <div class="row2">
+            <div class="stepper">
+              <button class="cart-minus" aria-label="Restar">−</button>
+              <span class="qty-val">${qty}</span>
+              <button class="cart-plus" aria-label="Sumar">+</button>
+            </div>
+            <button class="remove-link">Quitar</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  updateWhatsappLink();
+}
+
+function initCartInteractions(){
+  document.getElementById("cartBody").addEventListener("click", e => {
+    const item = e.target.closest(".cart-item");
+    if(!item) return;
+    const id = item.dataset.id;
+
+    if(e.target.classList.contains("cart-plus")) cart[id]++;
+    if(e.target.classList.contains("cart-minus")){
+      cart[id]--;
+      if(cart[id] <= 0) delete cart[id];
+    }
+    if(e.target.classList.contains("remove-link")) delete cart[id];
+
+    renderCart();
+  });
+}
+
+/* ---------------- mensaje de WhatsApp ---------------- */
+function updateWhatsappLink(){
+  const entries = Object.entries(cart).filter(([,qty]) => qty > 0);
+  let lines = [`¡Hola Midemarc! Quiero hacer este pedido:`, ``];
+
+  entries.forEach(([key, qty]) => {
+    const { id, size, color, app } = parseCartKey(key);
+    const p = getProduct(id);
+    const parts = [p.name];
+    if(p.badge) parts.push(`(${p.badge})`);
+    if(size) parts.push(`- Talle ${size}`);
+    if(color) parts.push(`- Color ${colorLabel(color)}`);
+    if(app) parts.push(`- Aplicación: ${app}`);
+    const label = parts.join(" ");
+    lines.push(`• ${qty}x ${label} — ${fmt(p.price * qty)}`);
+  });
+
+  lines.push(``, `Total: ${fmt(cartTotal())}`, ``, `Envío a todo el país. Quedo atento/a a los datos para coordinar.`);
+
+  const text = encodeURIComponent(lines.join("\n"));
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+  document.getElementById("whatsappBtn").href = url;
+}
+
+/* ---------------- drawer open/close ---------------- */
+function openDrawer(){
+  document.getElementById("cartDrawer").classList.add("open");
+  document.getElementById("overlay").classList.add("open");
+}
+function closeDrawer(){
+  document.getElementById("cartDrawer").classList.remove("open");
+  document.getElementById("overlay").classList.remove("open");
+}
+
+/* ---------------- init ---------------- */
+document.getElementById("openCartBtn").addEventListener("click", openDrawer);
+document.getElementById("closeCartBtn").addEventListener("click", closeDrawer);
+document.getElementById("overlay").addEventListener("click", closeDrawer);
+document.getElementById("year").textContent = new Date().getFullYear();
+
+renderCatNav();
+renderCatalog();
+initCardInteractions();
+initCartInteractions();
+renderCart();
+
+/* ---------------- scroll-reveal ---------------- */
+(function initReveal(){
+  const targets = document.querySelectorAll(".reveal, .reveal-stagger");
+  if(!targets.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add("in-view");
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold:0.15, rootMargin:"0px 0px -60px 0px" });
+  targets.forEach(t => io.observe(t));
+})();
+
+/* ---------------- cerrar menú móvil al navegar ---------------- */
+(function initMobileNavClose(){
+  const navCheck = document.getElementById("navCheck");
+  const mobileNav = document.getElementById("mobileNav");
+  if(!navCheck || !mobileNav) return;
+  mobileNav.querySelectorAll("a").forEach(a => {
+    a.addEventListener("click", () => { navCheck.checked = false; });
+  });
+})();
+</script>
+</body>
+</html>
