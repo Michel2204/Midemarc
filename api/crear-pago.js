@@ -71,6 +71,8 @@ module.exports = async (req, res) => {
     res.status(200).json({ init_point: result.init_point });
   } catch (err) {
     console.error("Error creando preferencia de Mercado Pago:", err);
-    res.status(500).json({ error: "No se pudo generar el pago" });
+    res.status(500).json({ 
+      error: "No se pudo generar el pago",
+      detalle: err.message || String(err)
+    });
   }
-};
