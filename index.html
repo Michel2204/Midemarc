@@ -1005,6 +1005,34 @@ footer .brand img{ height:56px; }
 }
 .whatsapp-btn:hover{ filter:brightness(1.08); }
 .whatsapp-btn svg{ width:20px; height:20px; }
+.sena-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin-bottom:10px;
+  padding-bottom:10px;
+  border-bottom:1px dashed var(--line);
+}
+.sena-row .label{ font-size:12.5px; color:var(--ember); text-transform:uppercase; letter-spacing:0.05em; }
+.sena-row .amount{ font-size:18px; font-family:'Bebas Neue',sans-serif; color:var(--ember); }
+.mp-btn{
+  width:100%;
+  background:#009ee3;
+  color:#fff;
+  font-weight:700;
+  font-size:16px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  padding:15px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.mp-btn:hover{ filter:brightness(1.08); }
+.mp-btn:disabled{ opacity:0.6; cursor:not-allowed; }
 .drawer-footer .note{
   font-size:12px;
   color:#8b8a86;
@@ -1311,11 +1339,20 @@ footer ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
       <span class="label">Total</span>
       <span class="amount" id="cartTotal">$0</span>
     </div>
+    <div class="sena-row">
+      <span class="label">Seña a abonar ahora (50%)</span>
+      <span class="amount" id="cartSena">$0</span>
+    </div>
+    <button type="button" class="mp-btn" id="mpPayBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Z"/><path d="M12.5 6.5h-1v6l4.2 2.5.5-.9-3.7-2.2Z"/></svg>
+      <span id="mpPayBtnText">Pagar seña con Mercado Pago</span>
+    </button>
+    <p class="note" id="mpError" style="display:none;color:#f4841f;"></p>
     <a href="#" target="_blank" class="whatsapp-btn" id="whatsappBtn">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.3c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.1.8.8-3-.2-.3C3.5 14.4 3 13.2 3 12c0-4.9 4-9 9-9s9 4.1 9 9-4 9-9 9z"/></svg>
       Enviar pedido por WhatsApp
     </a>
-    <p class="note">Se abrirá WhatsApp con el detalle de tu pedido listo para enviar.</p>
+    <p class="note">Podés escribirnos para coordinar, o abonar la seña ahora mismo para reservar tu pedido.</p>
   </div>
 </aside>
 
@@ -1859,6 +1896,7 @@ function renderCart(){
 
   document.getElementById("cartCount").textContent = cartItemCount();
   document.getElementById("cartTotal").textContent = fmt(cartTotal());
+  document.getElementById("cartSena").textContent = fmt(cartTotal() * 0.5);
 
   if(!entries.length){
     body.innerHTML = `<p class="empty-cart">Todavía no agregaste productos.</p>`;
@@ -1942,6 +1980,54 @@ function updateWhatsappLink(){
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
   document.getElementById("whatsappBtn").href = url;
 }
+
+/* ---------------- pago de seña con Mercado Pago ---------------- */
+async function iniciarPagoSena(){
+  const btn = document.getElementById("mpPayBtn");
+  const btnText = document.getElementById("mpPayBtnText");
+  const errorEl = document.getElementById("mpError");
+  errorEl.style.display = "none";
+
+  const entries = Object.entries(cart).filter(([,qty]) => qty > 0);
+  if(!entries.length){
+    errorEl.textContent = "Tu carrito está vacío.";
+    errorEl.style.display = "block";
+    return;
+  }
+
+  const items = entries.map(([key, qty]) => {
+    const { id, size, color, app } = parseCartKey(key);
+    const p = getProduct(id);
+    const parts = [p.name];
+    if(size) parts.push(`Talle ${size}`);
+    if(color) parts.push(colorLabel(color));
+    if(app) parts.push(app);
+    return { title: parts.join(" - "), quantity: qty, unit_price: p.price };
+  });
+
+  btn.disabled = true;
+  btnText.textContent = "Generando link de pago...";
+
+  try{
+    const res = await fetch("/api/crear-pago", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items })
+    });
+
+    if(!res.ok) throw new Error("No se pudo generar el pago");
+    const data = await res.json();
+    if(!data.init_point) throw new Error("Respuesta inválida del servidor");
+
+    window.location.href = data.init_point;
+  } catch(err){
+    errorEl.textContent = "Hubo un problema al generar el pago. Probá de nuevo o escribinos por WhatsApp.";
+    errorEl.style.display = "block";
+    btn.disabled = false;
+    btnText.textContent = "Pagar seña con Mercado Pago";
+  }
+}
+document.getElementById("mpPayBtn").addEventListener("click", iniciarPagoSena);
 
 /* ---------------- drawer open/close ---------------- */
 function openDrawer(){
