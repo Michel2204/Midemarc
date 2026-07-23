@@ -1,105 +1,79 @@
-// api/webhook-pago.js
-// Mercado Pago llama a esta URL automáticamente cuando cambia el estado
-// de un pago. Nosotros filtramos solo los que quedaron "approved" y
-// mandamos el email con el detalle del carrito.
-const crypto = require("crypto");
-const { MercadoPagoConfig, Payment } = require("mercadopago");
-
+// api/crear-pago.js
+// Función serverless de Vercel. Recibe el carrito, calcula el 50% (seña)
+// y crea una preferencia de pago en Mercado Pago. Devuelve el link (init_point)
+// al que el frontend redirige al comprador.
+const { MercadoPagoConfig, Preference } = require("mercadopago");
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
 });
 
-// Valida que el webhook realmente venga de Mercado Pago (recomendado).
-// El secret se obtiene en: Tu integración > Webhooks > Firma secreta.
-function firmaValida(req) {
-  const secret = process.env.MP_WEBHOOK_SECRET;
-  if (!secret) return true; // si todavía no lo configuraste, no bloqueamos
-
-  const xSignature = req.headers["x-signature"];
-  const xRequestId = req.headers["x-request-id"];
-  const dataId = req.query["data.id"] || req.body?.data?.id;
-  if (!xSignature || !dataId) return false;
-
-  const parts = Object.fromEntries(
-    xSignature.split(",").map((p) => p.trim().split("="))
-  );
-  const manifest = `id:${dataId};request-id:${xRequestId};ts:${parts.ts};`;
-  const hash = crypto
-    .createHmac("sha256", secret)
-    .update(manifest)
-    .digest("hex");
-
-  return hash === parts.v1;
-}
-
-async function enviarEmail({ cart, total, sena, paymentId }) {
-  const lineas = cart
-    .map((it) => `• ${it.quantity}x ${it.title} — $${it.unit_price * it.quantity}`)
-    .join("\n");
-
-  const texto = [
-    `Nuevo pedido pagado (Pago ID: ${paymentId})`,
-    ``,
-    lineas,
-    ``,
-    `Total del pedido: $${total}`,
-    `Seña acreditada (50%): $${sena}`,
-    `Saldo restante: $${total - sena}`,
-  ].join("\n");
-
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: process.env.NOTIFY_FROM_EMAIL, // ej: "Midemarc <pedidos@tudominio.com>"
-      to: [process.env.NOTIFY_TO_EMAIL],   // tu email, donde querés recibir el aviso
-      subject: `Nuevo pedido pagado — Seña $${sena}`,
-      text: texto,
-    }),
-  });
-}
-
 module.exports = async (req, res) => {
-  // Respondemos 200 rápido siempre (si no, Mercado Pago reintenta sin parar)
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Método no permitido" });
+    return;
+  }
   try {
-    if (req.method !== "POST") {
-      res.status(200).end();
+    const { items } = req.body;
+    if (!Array.isArray(items) || items.length === 0) {
+      res.status(400).json({ error: "El carrito está vacío" });
       return;
     }
 
-    if (!firmaValida(req)) {
-      console.warn("Webhook con firma inválida, ignorado");
-      res.status(200).end();
-      return;
+    // Validamos y calculamos el total en el SERVIDOR (nunca confiar en precios
+    // enviados desde el navegador). Acá lo hacemos con lo que llega del cart,
+    // pero lo ideal es cruzar cada item contra tu catálogo real de precios.
+    let total = 0;
+    for (const it of items) {
+      if (
+        typeof it.unit_price !== "number" ||
+        typeof it.quantity !== "number" ||
+        it.unit_price <= 0 ||
+        it.quantity <= 0
+      ) {
+        res.status(400).json({ error: "Item inválido en el carrito" });
+        return;
+      }
+      total += it.unit_price * it.quantity;
     }
 
-    const type = req.body?.type || req.query.type;
-    const paymentId = req.body?.data?.id || req.query["data.id"];
-    if (type !== "payment" || !paymentId) {
-      res.status(200).end();
-      return;
-    }
+    const sena = Math.round(total * 0.5 * 100) / 100;
+    const preference = new Preference(client);
+    const result = await preference.create({
+      body: {
+        items: [
+          {
+            title: "Seña (50%) - Pedido Midemarc",
+            quantity: 1,
+            unit_price: sena,
+            currency_id: "ARS",
+          },
+        ],
+        back_urls: {
+          success: `${process.env.SITE_URL}/pago-exitoso`,
+          failure: `${process.env.SITE_URL}/pago-fallido`,
+          pending: `${process.env.SITE_URL}/pago-pendiente`,
+        },
+        auto_return: "approved",
 
-    const payment = new Payment(client);
-    const info = await payment.get({ id: paymentId });
+        // Mercado Pago nos avisa acá cuando se acredita el pago
+        notification_url: `${process.env.SITE_URL}/api/webhook-pago`,
 
-    if (info.status !== "approved") {
-      res.status(200).end();
-      return;
-    }
+        // metadata: guardamos el carrito completo para poder leerlo
+        // desde el webhook cuando el pago se confirme
+        metadata: {
+          total_pedido: total,
+          sena,
+          cart: JSON.stringify(items), // el carrito completo, como texto
+        },
+      },
+    });
 
-    const cart = JSON.parse(info.metadata?.cart || "[]");
-    const total = info.metadata?.total_pedido;
-    const sena = info.metadata?.sena;
-
-    await enviarEmail({ cart, total, sena, paymentId });
-
-    res.status(200).json({ received: true });
+    res.status(200).json({ init_point: result.init_point });
   } catch (err) {
-    console.error("Error en webhook-pago:", err);
-    res.status(200).json({ received: true }); // igual 200, para no generar reintentos infinitos
+    console.error("Error creando preferencia de Mercado Pago:", err);
+    res.status(500).json({
+      error: "No se pudo generar el pago",
+      detalle: err.message || String(err),
+    });
   }
 };
